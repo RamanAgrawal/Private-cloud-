@@ -4,6 +4,7 @@ import { Server, Socket } from 'socket.io';
 import cors from 'cors';
 import { randomBytes } from 'crypto';
 import { registerSocketHandlers } from './socketHandlers';
+import { createFileRouter } from './storage/fileRoutes';
 
 const app = express();
 const httpServer = createServer(app);
@@ -56,7 +57,7 @@ app.get('/api/token', (req, res) => {
 app.get('/api/health', (_req, res) => res.json({ status: 'ok' }));
 
 // ── Socket.IO ──────────────────────────────────────────────────────────────
-const io = new Server(httpServer, {
+export const io = new Server(httpServer, {
   cors: { origin: '*', methods: ['GET', 'POST'] },
 });
 
@@ -84,6 +85,9 @@ io.on('connection', (socket: Socket) => {
     console.log(`[-] Client disconnected: ${socket.id}`);
   });
 });
+
+// ── File sharing routes (mounted after io is created) ─────────────────────
+app.use('/api', createFileRouter(io));
 
 // ── Start server ───────────────────────────────────────────────────────────
 const PORT = Number(process.env.PORT ?? 3001);

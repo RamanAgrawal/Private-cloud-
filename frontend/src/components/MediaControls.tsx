@@ -10,12 +10,13 @@ const controls = [
   { event: 'volume-down', label: '🔉', title: 'Vol –' },
   { event: 'play-pause',  label: '⏯',  title: 'Play / Pause' },
   { event: 'volume-up',   label: '🔊', title: 'Vol +' },
+  { event: 'mute',        label: '🔇', title: 'Mute Toggle' },
 ];
 
 export const MediaControls: React.FC<Props> = ({ socket, disabled }) => (
   <div>
     <h2 className="section-title">Media</h2>
-    <div className="grid grid-cols-3 gap-3">
+    <div className="grid grid-cols-4 gap-3">
       {controls.map(({ event, label, title }) => (
         <button
           key={event}

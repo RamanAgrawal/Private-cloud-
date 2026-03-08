@@ -3,6 +3,8 @@ import { createServer } from 'http';
 import { Server, Socket } from 'socket.io';
 import cors from 'cors';
 import { randomBytes } from 'crypto';
+import path from 'path';
+import fs from 'fs';
 import { registerSocketHandlers } from './socketHandlers';
 import { createFileRouter } from './storage/fileRoutes';
 
@@ -88,6 +90,16 @@ io.on('connection', (socket: Socket) => {
 
 // ── File sharing routes (mounted after io is created) ─────────────────────
 app.use('/api', createFileRouter(io));
+
+// ── Serve frontend static build (production) ──────────────────────────────
+const publicPath = path.join(__dirname, '../../public');
+if (fs.existsSync(publicPath)) {
+  app.use(express.static(publicPath));
+  // SPA fallback — all non-API routes return index.html
+  app.get('*', (_req, res) => {
+    res.sendFile(path.join(publicPath, 'index.html'));
+  });
+}
 
 // ── Start server ───────────────────────────────────────────────────────────
 const PORT = Number(process.env.PORT ?? 3001);

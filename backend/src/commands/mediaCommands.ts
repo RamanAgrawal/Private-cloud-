@@ -1,5 +1,5 @@
 // eslint-disable-next-line @typescript-eslint/no-var-requires
-const robot = require('robotjs') as typeof import('robotjs');
+const robot = require('@jitsi/robotjs') as typeof import('@jitsi/robotjs');
 
 export function volumeUp(): void {
   robot.keyTap('audio_vol_up');
@@ -11,4 +11,8 @@ export function volumeDown(): void {
 
 export function playPause(): void {
   robot.keyTap('audio_play');
+}
+
+export function toggleMute(): void {
+  robot.keyTap('audio_mute');
 }

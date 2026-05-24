@@ -46,12 +46,16 @@ app.get('/api/token', (req, res) => {
     ?? req.socket.remoteAddress
     ?? '';
 
+  console.log(`[AUTH] Token request from IP: ${clientIP}`);
+
   if (!isLocalIP(clientIP)) {
+    console.log(`[AUTH] Token request denied - non-local IP: ${clientIP}`);
     res.status(403).json({ error: 'Forbidden: non-local IP' });
     return;
   }
 
   const token = generateSessionToken();
+  console.log(`[AUTH] Token issued to local IP: ${clientIP}`);
   res.json({ token });
 });
 
@@ -65,15 +69,19 @@ export const io = new Server(httpServer, {
 
 io.use((socket: Socket, next) => {
   const clientIP = socket.handshake.address ?? '';
+
   if (!isLocalIP(clientIP)) {
+    console.log(`[AUTH] Socket connection rejected - non-local IP: ${clientIP}`);
     return next(new Error('Forbidden: non-local IP'));
   }
 
   const token = socket.handshake.auth?.token as string | undefined;
   if (!token || !validTokens.has(token)) {
+    console.log(`[AUTH] Socket connection rejected - invalid token from IP: ${clientIP}`);
     return next(new Error('Unauthorized: invalid session token'));
   }
 
+  console.log(`[AUTH] Socket connection authenticated from IP: ${clientIP}`);
   next();
 });
 
